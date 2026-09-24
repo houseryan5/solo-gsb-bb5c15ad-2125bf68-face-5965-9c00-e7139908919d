@@ -1,0 +1,18 @@
+services:
+  transcript-align-api:
+    build: .
+    image: transcript-align-api:latest
+    container_name: transcript-align-api
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      # 单侧字符数上限；DP 单元数 (识别字数+1)*(修订字数+1) 上限
+      MAX_CHARS_PER_SIDE: "${MAX_CHARS_PER_SIDE:-8000}"
+      MAX_ALIGNMENT_CELLS: "${MAX_ALIGNMENT_CELLS:-10000000}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
